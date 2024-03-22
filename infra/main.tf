@@ -73,3 +73,9 @@ resource "aws_lambda_permission" "with_sns" {
   principal     = "sns.amazonaws.com"
   source_arn    = "arn:aws:sns:us-east-1:101478099523:solicitar-relatorio"
 }
+
+resource "aws_sns_topic_subscription" "lambda_subscription" {
+  topic_arn = "arn:aws:sns:us-east-1:101478099523:solicitar-relatorio"
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.lambda-relatorios.arn
+}
