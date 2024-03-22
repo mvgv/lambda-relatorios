@@ -24,7 +24,7 @@ jobs:
   
     - name: Initialize Go Module
       run: |
-        go mod init github.com/mvgv/lambda-relatorios # Inicializa o módulo Go na pasta "app"
+        go mod init github.com/mvgv/lambda-registros # Inicializa o módulo Go na pasta "app"
   
     - name: Download Dependencies
       run: |
@@ -35,10 +35,12 @@ jobs:
     - name: Build Go
       run: |
         cd app
-        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o main  # Compilar seu código Go
+        ls -la
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bootstrap main.go  # Compilar seu código Go
         echo "GitHub Workspace: $GITHUB_WORKSPACE"
         mkdir $GITHUB_WORKSPACE/lambda
-        cp main $GITHUB_WORKSPACE/lambda  # Copiar o arquivo binário para a pasta "app"
+        ls -la
+        cp bootstrap $GITHUB_WORKSPACE/lambda  # Copiar o arquivo binário para a pasta "app"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -76,7 +78,7 @@ jobs:
     - name: Create Lambda Deployment Package
       run: |
         cd lambda
-        zip -r lambda-deployment-package.zip . -i main
+        zip -r lambda-deployment-package.zip . -i bootstrap
         pwd
         ls -la
 
@@ -100,4 +102,3 @@ jobs:
       run: |
         cd infra
         terraform apply -input=false -var="TF_LAMBDA_ZIP_PATH=${{ github.workspace }}/lambda/lambda-deployment-package.zip" -auto-approve
-      
