@@ -24,7 +24,7 @@ jobs:
   
     - name: Initialize Go Module
       run: |
-        go mod init github.com/mvgv/lambda-registros # Inicializa o módulo Go na pasta "app"
+        go mod init github.com/mvgv/lambda-relatorios # Inicializa o módulo Go na pasta "app"
   
     - name: Download Dependencies
       run: |

@@ -6,9 +6,9 @@ variable "TF_LAMBDA_ZIP_PATH" {
   type = string
 }
 
-resource "aws_lambda_function" "example" {
+resource "aws_lambda_function" "lambda-relatorios" {
   function_name = "lambda-relatorios"
-  role         = aws_iam_role.example.arn
+  role         = aws_iam_role.lambda-relatorios.arn
   handler      = "main"
   runtime      = "provided.al2023"
 
@@ -23,7 +23,7 @@ resource "aws_lambda_function" "example" {
 
 resource "aws_iam_role_policy" "lambda_exec_policy" {
   name = "crud-api-exec-role-policy"
-  role = aws_iam_role.example.id
+  role = aws_iam_role.lambda-relatorios.id
 
   policy = <<EOF
 {
@@ -33,14 +33,19 @@ resource "aws_iam_role_policy" "lambda_exec_policy" {
             "Action": "dynamodb:*",
             "Effect": "Allow",
             "Resource": "*"
+        },
+        {
+            "Action": "sns:*",
+            "Effect": "Allow",
+            "Resource": "*"
         }     
       ]  
 }  
 EOF
 }
 
-resource "aws_iam_role" "example" {
-  name = "example"
+resource "aws_iam_role" "lambda-relatorios" {
+  name = "lambda-relatorios"
   
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -56,12 +61,15 @@ resource "aws_iam_role" "example" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "example" {
+resource "aws_iam_role_policy_attachment" "lambda-relatorios" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.example.name
+  role       = aws_iam_role.lambda-relatorios.name
 }
 
-
-
-
-
+resource "aws_lambda_permission" "with_sns" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda-relatorios.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = "arn:aws:sns:us-east-1:101478099523:solicitar-relatorio"
+}
